@@ -59,9 +59,9 @@ gcry_err_code_t gcry_ntru_keygen (gcry_sexp_t genparms, gcry_sexp_t *r_skey);
 gcry_err_code_t gcry_ntru_encrypt (gcry_sexp_t *r_ciph, gcry_sexp_t s_data, gcry_sexp_t keyparms);
 gcry_err_code_t gcry_ntru_decrypt (gcry_sexp_t *r_ciph, gcry_sexp_t s_data, gcry_sexp_t keyparms);
 
-// data conversion: S expression <---> ntru data
+/* data conversion: S expression <---> ntru data*/
 gcry_sexp_t convert_ntru_data_to_sexp (const uint8_t* ntru_data, const size_t ntru_data_len);
-// void convert_sexp_data_to_ntru (const gcry_sexp_t sexp_data, uint8_t* ntru_data, size_t* ntru_data_len);
+/* void convert_sexp_data_to_ntru (const gcry_sexp_t sexp_data, uint8_t* ntru_data, size_t* ntru_data_len);*/
 
 /*
  * dump functions
@@ -69,13 +69,13 @@ gcry_sexp_t convert_ntru_data_to_sexp (const uint8_t* ntru_data, const size_t nt
 static gpg_err_code_t gcry_ntru_comp_keygrip (gcry_md_hd_t md, gcry_sexp_t keyparms);
 static unsigned int gcry_ntru_get_nbits (gcry_sexp_t parms);
 static gcry_err_code_t gcry_ntru_check_secret_key (gcry_sexp_t keyparms);
-//static gcry_err_code_t gcry_ntru_self_tests (int algo, int extended, selftest_report_func_t report);
-//static gcry_err_code_t ntru_self_tests (selftest_report_func_t report);
+/*static gcry_err_code_t gcry_ntru_self_tests (int algo, int extended, selftest_report_func_t report);*/
+/*static gcry_err_code_t ntru_self_tests (selftest_report_func_t report);*/
 
 /*
  * misc functions
  */
 static uint8_t get_entropy(ENTROPY_CMD  cmd, uint8_t *out);
-//size_t my_strlen(const unsigned char *str);
+/*size_t my_strlen(const unsigned char *str);*/
 
-#endif //NTRU_GCRYPT_WRAPPER_H
+#endif /*NTRU_GCRYPT_WRAPPER_H*/

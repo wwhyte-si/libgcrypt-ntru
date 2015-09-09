@@ -48,46 +48,48 @@ static const char *ntru_names[] =
 };
 
 gcry_pk_spec_t _gcry_pubkey_spec_ntru = {
-	GCRY_PK_NTRU,               //  algo;
-	{0,0},                      //  struct {
-								//  unsigned int disabled:1;
-								//  unsigned int fips:1;
-								//  } flags;
-	GCRY_PK_USAGE_ENCR,         //  int use;
-	"ntru",                     //  const char *name;
-	ntru_names,                 //  const char **aliases;
-	NULL,                       //  const char *elements_pkey;
-	NULL,                       //  const char *elements_skey;
-	NULL,                       //  const char *elements_enc;
-	NULL,                       //  const char *elements_sig;
-	NULL,                       //  const char *elements_grip;
-	gcry_ntru_keygen,           //  gcry_pk_generate_t generate;
-	gcry_ntru_check_secret_key, //  gcry_pk_check_secret_key_t check_secret_key;
-	gcry_ntru_encrypt,          //  gcry_pk_encrypt_t encrypt;
-	gcry_ntru_decrypt,          //  gcry_pk_decrypt_t decrypt;
-	NULL,                       //  gcry_pk_sign_t sign;
-	NULL,                       //  gcry_pk_verify_t verify;
-	gcry_ntru_get_nbits,        //  gcry_pk_get_nbits_t get_nbits;
-	NULL,						//  selftest_func_t selftest;
-	gcry_ntru_comp_keygrip,     //  pk_comp_keygrip_t comp_keygrip;
-	NULL,                       //  pk_get_curve_t get_curve;
-	NULL                        //  pk_get_curve_param_t get_curve_param;
+	GCRY_PK_NTRU,               /*  algo;                           */
+	{0,0},                      /*  struct {
+								    unsigned int disabled:1;
+								    unsigned int fips:1;
+								    } flags;                        */
+	GCRY_PK_USAGE_ENCR,         /*  int use;                        */
+	"ntru",                     /*  const char *name;               */
+	ntru_names,                 /*  const char **aliases;           */
+	NULL,                       /*  const char *elements_pkey;      */
+	NULL,                       /*  const char *elements_skey;      */
+	NULL,                       /*  const char *elements_enc;       */
+	NULL,                       /*  const char *elements_sig;       */
+	NULL,                       /*  const char *elements_grip;      */
+	gcry_ntru_keygen,           /*  gcry_pk_generate_t generate;    */
+	gcry_ntru_check_secret_key, /*  gcry_pk_check_secret_key_t
+	                                        check_secret_key;       */
+	gcry_ntru_encrypt,          /*  gcry_pk_encrypt_t encrypt;      */
+	gcry_ntru_decrypt,          /*  gcry_pk_decrypt_t decrypt;      */
+	NULL,                       /*  gcry_pk_sign_t sign;            */
+	NULL,                       /*  gcry_pk_verify_t verify;        */
+	gcry_ntru_get_nbits,        /*  gcry_pk_get_nbits_t get_nbits;  */
+	NULL,						/*  selftest_func_t selftest;       */
+	gcry_ntru_comp_keygrip,     /*  pk_comp_keygrip_t comp_keygrip; */
+	NULL,                       /*  pk_get_curve_t get_curve;       */
+	NULL                        /*  pk_get_curve_param_t
+	                                       get_curve_param;         */
 };
 
 static gpg_err_code_t gcry_ntru_comp_keygrip (gcry_md_hd_t md, gcry_sexp_t keyparms)
 {
-    fprintf (stderr,"NTRU compute keygrip function not required/implemented\n");
+    log_info("NTRU compute keygrip function not required/implemented\n");
 	return 0;
 }
 
 static unsigned int gcry_ntru_get_nbits (gcry_sexp_t parms)
 {
-    fprintf (stderr,"NTRU get nbits function not required/implemented\n");
+    log_info("NTRU get nbits function not required/implemented\n");
 	return 0;
 }
 static gcry_err_code_t gcry_ntru_check_secret_key (gcry_sexp_t keyparms)
 {
-    fprintf (stderr,"NTRU check secret key function not required/implemented\n");
+    log_info("NTRU check secret key function not required/implemented\n");
 	return 0;
 }
 
@@ -111,19 +113,19 @@ NTRU_ENCRYPT_PARAM_SET_ID gcry_ntru_get_param_id (gcry_sexp_t genparms)
 
 
 /* Type for the pk_generate function.  */
-// typedef gcry_err_code_t (*gcry_pk_generate_t) (gcry_sexp_t genparms,
-//                                                gcry_sexp_t *r_skey);
+/* typedef gcry_err_code_t (*gcry_pk_generate_t) (gcry_sexp_t genparms,
+                                                  gcry_sexp_t *r_skey);*/
 gcry_err_code_t gcry_ntru_keygen (gcry_sexp_t genparms, gcry_sexp_t *r_skey)
 {
 
     NTRU_ENCRYPT_PARAM_SET_ID   paramid;
     int                         rc;                                     /* return code */
-    uint8_t                     *public_key;                            /* sized for EES401EP2 */
-    uint16_t                    public_key_len;                         /* no. of octets in public key */
-    uint8_t                     *private_key;                           /* sized for EES401EP2 */
-    uint16_t                    private_key_len;                        /* no. of octets in private key */
+    unsigned char               *public_key;                            /* sized for EES401EP2 */
+    u16                         public_key_len;                         /* no. of octets in public key */
+    unsigned char               *private_key;                           /* sized for EES401EP2 */
+    u16                         private_key_len;                        /* no. of octets in private key */
     DRBG_HANDLE                 drbg;                                   /* handle for instantiated DRBG */
-    uint8_t                     *pers_str;
+    unsigned char               *pers_str;
     gcry_sexp_t                 temp_pk, temp_sk;
 
     /* start key generation */
@@ -131,8 +133,8 @@ gcry_err_code_t gcry_ntru_keygen (gcry_sexp_t genparms, gcry_sexp_t *r_skey)
 
     if (paramid <0)
     {
-        fprintf (stderr, "gcry_ntru: unrecognized parameter id\n");
-        return -1;
+        log_error ("gcry_ntru: unrecognized parameter id\n");
+        return GPG_ERR_INV_VALUE;
     }
 /*
     if (paramid == NTRU_EES439EP1)
@@ -143,14 +145,27 @@ gcry_err_code_t gcry_ntru_keygen (gcry_sexp_t genparms, gcry_sexp_t *r_skey)
         printf("using NTRU_EES743EP1\n");
 */
     /* optional personal string for DRBG */
+
     /* use this prg for best security */
-//    pers_str    = (uint8_t*)_gcry_random_bytes (32, GCRY_STRONG_RANDOM);
+    /* pers_str    = (uint8_t*)_gcry_random_bytes (32, GCRY_STRONG_RANDOM); */
+
     /* use this one to improve performance */
-    pers_str    = (uint8_t*)_gcry_random_bytes (32, GCRY_WEAK_RANDOM);
+    pers_str    = _gcry_random_bytes (32, GCRY_WEAK_RANDOM);
 
 
-    public_key  = (uint8_t *) malloc (_MAX_NTRU_BUF_SIZE_);
-    private_key = (uint8_t *) malloc (_MAX_NTRU_BUF_SIZE_);
+    public_key  = malloc (_MAX_NTRU_BUF_SIZE_);
+    if (public_key  == NULL)
+    {
+        log_error ( "malloc failed\n");
+        return(-1);
+    }
+
+    private_key = malloc (_MAX_NTRU_BUF_SIZE_);
+    if (private_key  == NULL)
+    {
+        log_error ( "malloc failed\n");
+        return(-1);
+    }
 
     memset(public_key, 0, _MAX_NTRU_BUF_SIZE_);
     memset(private_key, 0, _MAX_NTRU_BUF_SIZE_);
@@ -160,19 +175,19 @@ gcry_err_code_t gcry_ntru_keygen (gcry_sexp_t genparms, gcry_sexp_t *r_skey)
     rc = ntru_crypto_drbg_instantiate(256, pers_str, sizeof(pers_str), (ENTROPY_FN) &get_entropy, &drbg);
     if (rc!=0)
     {
-        fprintf (stderr, "drbg error, ntru code: %d\n", rc);
+        log_error ("drbg error, ntru code: %d\n", rc);
         return rc;
     }
     rc = ntru_crypto_ntru_encrypt_keygen(drbg, paramid , &public_key_len, NULL, &private_key_len, NULL);
     if (rc!=0)
     {
-        fprintf (stderr, "key gen error, ntru code: %d\n", rc);
+        log_error ("key gen error, ntru code: %d\n", rc);
         return rc;
     }
     rc = ntru_crypto_ntru_encrypt_keygen(drbg, paramid , &public_key_len, public_key, &private_key_len, private_key);
     if (rc!=0)
     {
-        fprintf (stderr, "key gen error, ntru code: %d\n", rc);
+        log_error ("key gen error, ntru code: %d\n", rc);
         return rc;
     }
 
@@ -183,17 +198,17 @@ gcry_err_code_t gcry_ntru_keygen (gcry_sexp_t genparms, gcry_sexp_t *r_skey)
          "(key-data(public-key(ntru%S))(private-key(ntru%S)))", temp_pk, temp_sk);
     if (rc!=0)
     {
-        fprintf (stderr, "gcry_sexp_build error: %s\n",  _gcry_strerror (rc));
+        log_error ("gcry_sexp_build error: %s\n",  _gcry_strerror (rc));
         return rc;
     }
 
-//    _gcry_sexp_dump(*r_skey);
+    /* _gcry_sexp_dump(*r_skey); */
 
     /* cleaning up */
     rc = ntru_crypto_drbg_uninstantiate(drbg);
     if (rc!=0)
     {
-        fprintf (stderr, "drbg error, ntru code: %d\n", rc);
+        log_error ("drbg error, ntru code: %d\n", rc);
         return rc;
     }
     free(public_key);
@@ -205,23 +220,39 @@ gcry_err_code_t gcry_ntru_keygen (gcry_sexp_t genparms, gcry_sexp_t *r_skey)
 }
 
 /* Type for the pk_encrypt function.  */
-// typedef gcry_err_code_t (*gcry_pk_encrypt_t) (gcry_sexp_t *r_ciph,
-//                                               gcry_sexp_t s_data,
-//                                               gcry_sexp_t keyparms);
+/* typedef gcry_err_code_t (*gcry_pk_encrypt_t) (gcry_sexp_t *r_ciph,
+                                                 gcry_sexp_t s_data,
+                                                 gcry_sexp_t keyparms);*/
 gcry_err_code_t gcry_ntru_encrypt (gcry_sexp_t *r_ciph, gcry_sexp_t s_data, gcry_sexp_t keyparms)
 {
-	uint8_t     rc;
-    uint8_t     *msg_buf;
-    uint8_t     *key_buf;
-    uint8_t     *working_buf;
-    size_t      msg_len;
-    size_t      key_len;
-    size_t      working_buf_len;
-    DRBG_HANDLE drbg;
+    int             rc;
+    unsigned char   *msg_buf;
+    unsigned char   *key_buf;
+    unsigned char   *working_buf;
+    size_t          msg_len;
+    size_t          key_len;
+    size_t          working_buf_len;
+    DRBG_HANDLE     drbg;
 
-    working_buf = (uint8_t *) malloc (_MAX_NTRU_BUF_SIZE_);
-    msg_buf     = (uint8_t *) malloc (_MAX_NTRU_BUF_SIZE_);
-    key_buf     = (uint8_t *) malloc (_MAX_NTRU_BUF_SIZE_);
+    working_buf = malloc (_MAX_NTRU_BUF_SIZE_);
+    if (working_buf  == NULL)
+    {
+        log_error ("malloc failed\n");
+        return(-1);
+    }
+    msg_buf     = malloc (_MAX_NTRU_BUF_SIZE_);
+    if (msg_buf  == NULL)
+    {
+        log_error ("malloc failed\n");
+        return(-1);
+    }
+    key_buf     = malloc (_MAX_NTRU_BUF_SIZE_);
+    if (key_buf  == NULL)
+    {
+        log_error ("malloc failed\n");
+        return(-1);
+    }
+
     memset(msg_buf, 0, _MAX_NTRU_BUF_SIZE_);
     memset(key_buf, 0, _MAX_NTRU_BUF_SIZE_);
     memset(working_buf, 0, _MAX_NTRU_BUF_SIZE_);
@@ -239,58 +270,74 @@ gcry_err_code_t gcry_ntru_encrypt (gcry_sexp_t *r_ciph, gcry_sexp_t s_data, gcry
     rc = ntru_crypto_drbg_instantiate(256, NULL, 0, (ENTROPY_FN) &get_entropy, &drbg);
     if (rc!=0)
     {
-        fprintf (stderr, "drbg error, ntru code: %d\n", rc);
+        log_error ("drbg error, ntru code: %d\n", rc);
         return rc;
     }
     rc = ntru_crypto_ntru_encrypt(drbg, key_len, key_buf, msg_len, msg_buf, &working_buf_len, NULL);
     if (rc!=0)
     {
-        fprintf (stderr, "encryption error, ntru code: %d\n", rc);
+        log_error ("encryption error, ntru code: %d\n", rc);
         return rc;
     }
     rc = ntru_crypto_ntru_encrypt(drbg, key_len, key_buf, msg_len, msg_buf, &working_buf_len, working_buf);
     if (rc!=0)
     {
-        fprintf (stderr, "encryption error, ntru code: %d\n", rc);
+        log_error ("encryption error, ntru code: %d\n", rc);
         return rc;
     }
 
     *r_ciph     = convert_ntru_data_to_sexp (working_buf, working_buf_len);
-//    _gcry_sexp_dump(*r_ciph);
+    /* _gcry_sexp_dump(*r_ciph); */
 
     /* cleaning up */
     rc = ntru_crypto_drbg_uninstantiate(drbg);
     if (rc!=0)
     {
-        fprintf (stderr, "drbg error, ntru code: %d\n", rc);
+        log_error ("drbg error, ntru code: %d\n", rc);
         return rc;
     }
     free(key_buf);
-//    free(working_buf);
-//    free(msg_buf);
+
     return rc;
 }
 
 
 
 /* Type for the pk_decrypt function.  */
-// typedef gcry_err_code_t (*gcry_pk_decrypt_t) (gcry_sexp_t *r_plain,
-//                                               gcry_sexp_t s_data,
-//                                               gcry_sexp_t keyparms);
+/* typedef gcry_err_code_t (*gcry_pk_decrypt_t) (gcry_sexp_t *r_plain,
+                                                 gcry_sexp_t s_data,
+                                                 gcry_sexp_t keyparms);*/
 gcry_err_code_t gcry_ntru_decrypt (gcry_sexp_t *r_msg, gcry_sexp_t s_data, gcry_sexp_t keyparms)
 {
-    int         rc;
-    uint8_t     *cipher_buf;
-    uint8_t     *key_buf;
-    uint8_t     *working_buf;
-    size_t      cipher_len;
-    size_t      key_len;
-    size_t      working_buf_len;
-    gcry_sexp_t key;
+    int             rc;
+    unsigned char   *cipher_buf;
+    unsigned char   *key_buf;
+    unsigned char   *working_buf;
+    size_t          cipher_len;
+    size_t          key_len;
+    size_t          working_buf_len;
+    gcry_sexp_t     key;
 
-    working_buf = (uint8_t *) malloc (_MAX_NTRU_BUF_SIZE_);
-    cipher_buf  = (uint8_t *) malloc (_MAX_NTRU_BUF_SIZE_);
-    key_buf     = (uint8_t *) malloc (_MAX_NTRU_BUF_SIZE_);
+    working_buf = malloc (_MAX_NTRU_BUF_SIZE_);
+    if (working_buf  == NULL)
+    {
+        log_error ("malloc failed\n");
+        return(-1);
+    }
+    cipher_buf     = malloc (_MAX_NTRU_BUF_SIZE_);
+    if (cipher_buf  == NULL)
+    {
+        log_error ("malloc failed\n");
+        return(-1);
+    }
+    key_buf     = malloc (_MAX_NTRU_BUF_SIZE_);
+    if (key_buf  == NULL)
+    {
+        log_error ("malloc failed\n");
+        return(-1);
+    }
+
+
     memset(cipher_buf, 0, _MAX_NTRU_BUF_SIZE_);
     memset(key_buf, 0, _MAX_NTRU_BUF_SIZE_);
     memset(working_buf, 0, _MAX_NTRU_BUF_SIZE_);
@@ -311,20 +358,20 @@ gcry_err_code_t gcry_ntru_decrypt (gcry_sexp_t *r_msg, gcry_sexp_t s_data, gcry_
     rc = ntru_crypto_ntru_decrypt(key_len, key_buf, cipher_len, cipher_buf, &working_buf_len, NULL);
     if (rc!=0)
     {
-        fprintf (stderr, "decryption error, ntru code: %d\n", rc);
+        log_error ("decryption error, ntru code: %d\n", rc);
         return rc;
     }
     rc = ntru_crypto_ntru_decrypt(key_len, key_buf, cipher_len, cipher_buf, &working_buf_len, working_buf);
     if (rc!=0)
     {
-        fprintf (stderr, "decryption error, ntru code: %d\n", rc);
+        log_error ("decryption error, ntru code: %d\n", rc);
         return rc;
     }
     working_buf[working_buf_len] = '\0';
     rc = _gcry_sexp_build (r_msg, NULL, "%s", working_buf);
     if (rc!=0)
     {
-        fprintf (stderr, "gcry_sexp_build error: %s\n",  _gcry_strerror (rc));
+        log_error ("gcry_sexp_build error: %s\n",  _gcry_strerror (rc));
         return rc;
     }
     /* cleaning up */
@@ -344,14 +391,25 @@ gcry_err_code_t gcry_ntru_decrypt (gcry_sexp_t *r_msg, gcry_sexp_t s_data, gcry_
  */
 gcry_sexp_t convert_ntru_data_to_sexp (const uint8_t* ntru_data, const size_t ntru_data_len)
 {
-    gcry_sexp_t sexp_data;
-    uint8_t     *base64_data;
-    size_t      base64_data_len = _MAX_NTRU_BUF_SIZE_;
-    uint8_t     *tmp_str;
-    int rc;
-    base64_data = (uint8_t*) malloc (ntru_data_len*2*sizeof(uint8_t));
-    tmp_str     = (uint8_t*) malloc ((base64_data_len+2)*sizeof(uint8_t));
+    int             rc;
+    gcry_sexp_t     sexp_data;
+    unsigned char   *base64_data;
+    size_t          base64_data_len;
+    unsigned char   *tmp_str;
 
+    base64_data_len = _MAX_NTRU_BUF_SIZE_;
+    base64_data = malloc (ntru_data_len*2);
+    if (base64_data  == NULL)
+    {
+        log_error ("malloc failed\n");
+        return NULL;
+    }
+    tmp_str     = malloc (base64_data_len+2);
+    if (tmp_str   == NULL)
+    {
+        log_error ("malloc failed\n");
+        return  NULL;
+    }
     rc = base64_encode(base64_data, &base64_data_len, ntru_data, ntru_data_len);
 
     tmp_str[0] = '(';
@@ -359,17 +417,17 @@ gcry_sexp_t convert_ntru_data_to_sexp (const uint8_t* ntru_data, const size_t nt
     tmp_str[2] = 'T';
     tmp_str[3] = 'R';
     tmp_str[4] = 'U';
-    memcpy(tmp_str+5, base64_data, base64_data_len*sizeof(uint8_t));
+    memcpy(tmp_str+5, base64_data, base64_data_len);
     tmp_str[base64_data_len+5]  = ')';
     tmp_str[base64_data_len+6]  = '\0';
 
     rc = _gcry_sexp_sscan (&sexp_data, NULL, tmp_str, strlen(tmp_str));
     if (rc!=0)
     {
-        fprintf (stderr, "gcry_sexp_new: %s\n",  _gcry_strerror (rc));
-        return rc;
+        log_error ("gcry_sexp_new: %s\n",  _gcry_strerror (rc));
+        return NULL;
     }
-//    _gcry_sexp_dump(sexp_data);
+    /* _gcry_sexp_dump(sexp_data);*/
 
     free(tmp_str);
     free(base64_data);
@@ -409,27 +467,28 @@ size_t my_strlen(const uint8_t *str)
 }
 */
 
-static uint8_t
-get_entropy(
-    ENTROPY_CMD  cmd,
-    uint8_t     *out)
+static uint8_t get_entropy( ENTROPY_CMD cmd,  uint8_t *out)
 {
 
-    int num_bytes = 48;
+    int             num_bytes;
+    uint8_t         *seed;
+    static size_t   index;
+
+
     /*
      * dimension        number of bytes
      * 439              24
      * 593              36
      * 743              48
      */
-    /* use this prg for best security */
-//    uint8_t *seed = (uint8_t*)_gcry_random_bytes (num_bytes, GCRY_STRONG_RANDOM);
-    /* use this prg to improve performance */
-    uint8_t *seed = (uint8_t*)_gcry_random_bytes (num_bytes, GCRY_WEAK_RANDOM);
 
+    num_bytes = 48;
 
+    /* use this prng for best security */
+    /* uint8_t *seed = (uint8_t*)_gcry_random_bytes (num_bytes, GCRY_STRONG_RANDOM); */
+    /* use this prng to improve performance */
+    seed = _gcry_random_bytes (num_bytes, GCRY_WEAK_RANDOM);
 
-    static size_t   index;
 
     if (cmd == INIT) {
         /* Any initialization for a real entropy source goes here. */
