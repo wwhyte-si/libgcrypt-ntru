@@ -1,3 +1,10 @@
+Libgcrypt is under LGPL license (see below). NTRUEncrypt is available
+under either GPL license or its FOSS exception. 
+https://github.com/NTRUOpenSourceProject/ntru-crypto/blob/master/FOSS%20Exception.md
+
+
+=======================begin libgcrypt's licenses text==================
+
 Additional license notices for Libgcrypt.                    -*- org -*-
 
 This file contains the copying permission notices for various files in
